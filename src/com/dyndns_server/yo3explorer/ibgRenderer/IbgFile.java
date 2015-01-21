@@ -11,7 +11,21 @@ public class IbgFile
 {
     public IbgFile(String s)
     {
-
+        if(s.startsWith("IBGD"))
+        {
+            StringReader sr = new StringReader(s);
+            br = new BufferedReader(sr);
+        }
+        else
+        {
+            File sFile = new File(s);
+            try {
+                FileInputStream fis = new FileInputStream(sFile.getPath());
+                br = new BufferedReader(new InputStreamReader(fis));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public IbgFile(File f)
