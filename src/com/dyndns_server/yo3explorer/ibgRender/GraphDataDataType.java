@@ -5,15 +5,34 @@ package com.dyndns_server.yo3explorer.ibgRender;
  */
 public class GraphDataDataType
 {
-    GraphDataDataType()
-    {
-
-    }
-
     byte Mode;
     byte Form;
     int SectorLength;
     boolean error;
+    boolean isCd;
+
+    GraphDataDataType() {
+
+    }
+
+    static GraphDataDataType parse(String s) {
+        GraphDataDataType result = new GraphDataDataType();
+        s = s.replace("MODE", "");
+        s = s.replace("FORM", "");
+        String[] params = s.split("/");
+        if (params.length == 2) {
+            //for DVD & BD
+            result.Mode = Byte.parseByte(params[0]);
+            result.SectorLength = Integer.parseInt(params[1]);
+        } else {
+            //for CD
+            result.Mode = Byte.parseByte(params[0]);
+            result.Form = Byte.parseByte(params[1]);
+            result.SectorLength = Integer.parseInt(params[2]);
+            result.isCd = true;
+        }
+        return result;
+    }
 
     public byte getMode() {
         return Mode;
@@ -27,25 +46,17 @@ public class GraphDataDataType
         return SectorLength;
     }
 
-    public boolean isValid()
-    {
+    public boolean isValid() {
         return !error;
     }
 
     @Override
-    public String toString() {
-        return String.format("MODE%d/FORM%d/%d",Mode,Form,SectorLength);
-    }
-
-    static GraphDataDataType parse(String s)
+    public String toString()
     {
-        GraphDataDataType result = new GraphDataDataType();
-        s = s.replace("MODE","");
-        s = s.replace("FORM","");
-        String[] params = s.split("/");
-        result.Mode = Byte.parseByte(params[0]);
-        result.Form = Byte.parseByte(params[1]);
-        result.SectorLength = Integer.parseInt(params[2]);
-        return result;
+        if (isCd) {
+            return String.format("MODE%d/FORM%d/%d", Mode, Form, SectorLength);
+        } else {
+            return String.format("MODE%d/%d", Mode, SectorLength);
+        }
     }
 }

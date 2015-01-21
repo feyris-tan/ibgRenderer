@@ -14,6 +14,17 @@ import java.util.Locale;
  */
 public class GraphData
 {
+    boolean error;
+    Exception whatHappen;
+    int ibgdVersion;
+    Date date;
+    int sample_rate;
+    GraphDataDevice device;
+    GraphDataMedia media;
+    GraphDataData data;
+    GraphDataVerify verify;
+    boolean hrpc;
+    ArrayList<GraphDataSample> samples;
     public GraphData(File f)
     {
         try {
@@ -25,7 +36,6 @@ public class GraphData
             error = true;
         }
     }
-
     public GraphData(byte[] data)
     {
         this(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data))));
@@ -34,7 +44,6 @@ public class GraphData
     {
         this(new BufferedReader(r));
     }
-
     public GraphData(BufferedReader br)
     {
         read(br);
@@ -42,7 +51,6 @@ public class GraphData
 
     void read(BufferedReader br)
     {
-        int phase = 1;
         try {
             String magic = br.readLine();
             if(!magic.equals("IBGD"))
@@ -73,107 +81,86 @@ public class GraphData
                 if (params[0].equals("IBGD_VERSION"))
                 {
                     ibgdVersion = Integer.parseInt(params[1]);
-                    continue;
                 }
-
                 else if (params[0].equals("DATE"))
                 {
                     DateFormat format = new SimpleDateFormat("dd.MM.yyyy kk:m:s", Locale.ENGLISH);
                     date = (format.parse(params[1]));
-                    continue;
                 }
 
                 else if (params[0].equals("SAMPLE_RATE"))
                 {
                     sample_rate = Integer.parseInt(params[1]);
-                    continue;
                 }
-
                 else if (params[0].equals("DEVICE"))
                 {
-                    continue;
                 }
-
                 else if (params[0].equals("DEVICE_ADDRESS"))
                 {
                     getDevice().setAddress(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DEVICE_MAKEMODEL"))
                 {
                     getDevice().setMakeModel(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DEVICE_FIRMWAREVERSION"))
                 {
                     getDevice().setFirmwareVersion(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DEVICE_DRIVELETTER"))
                 {
                     getDevice().setDriveLetter(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DEVICE_BUSTYPE"))
                 {
                     getDevice().setBusType(params[1]);
-                    continue;
                 }
 
                 else if (params[0].equals("MEDIA_TYPE"))
                 {
                     getMedia().setType(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("MEDIA_BOOKTYPE"))
                 {
                     getMedia().setBookType(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("MEDIA_ID"))
                 {
                     getMedia().setID(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("MEDIA_TRACKPATH"))
                 {
                     getMedia().setTrackPath(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("MEDIA_SPEEDS"))
                 {
-                    getMedia().setSpeeds(params[1]);
-                    continue;
+                    if (!params[1].equals("N/A")) {
+                        getMedia().setSpeeds(params[1]);
+                    }
                 }
                 else if (params[0].equals("MEDIA_CAPACITY"))
                 {
                     getMedia().setCapacity(Long.parseLong(params[1]));
-                    continue;
                 }
                 else if (params[0].equals("MEDIA_LAYER_BREAK"))
                 {
                     getMedia().setLayerBreak(Long.parseLong(params[1]));
-                    continue;
                 }
                 else if (params[0].equals("DATA_IMAGEFILE"))
                 {
                     getData().setImageFile(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DATA_SECTORS"))
                 {
                     getData().setSectors(Long.parseLong(params[1]));
-                    continue;
                 }
                 else if (params[0].equals("DATA_TYPE"))
                 {
                     getData().setType(params[1]);
-                    continue;
                 }
                 else if (params[0].equals("DATA_VOLUMEIDENTIFIER"))
                 {
                     getData().setVolumeIdentifier(params[1]);
-                    continue;
                 }
 
                 else if (params[0].equals("VERIFY_SPEED_START"))
@@ -240,23 +227,10 @@ public class GraphData
 
     }
 
-    boolean error;
-    Exception whatHappen;
-
     public boolean isOk()
     {
         return !error;
     }
-
-    int ibgdVersion;
-    Date date;
-    int sample_rate;
-    GraphDataDevice device;
-    GraphDataMedia media;
-    GraphDataData data;
-    GraphDataVerify verify;
-    boolean hrpc;
-    ArrayList<GraphDataSample> samples;
 
     public GraphDataDevice getDevice()
     {
@@ -319,7 +293,7 @@ public class GraphData
             }
             if (sample.getSampleDistance() > result)
             {
-                result = (int)sample.getSampleDistance();
+                result = sample.getSampleDistance();
             }
         }
         return result;
